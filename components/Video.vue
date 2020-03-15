@@ -7,29 +7,61 @@
         type="module"
         src="https://cdn.jsdelivr.net/npm/handtrackjs/dist/handtrack.min.js"
       ></script>
+-->
+      <script type="module">
+        import * as handTrack from 'https://cdn.jsdelivr.net/npm/handtrackjs/dist/handtrack.min.js'
+      </script>
 
-      <img
-        id="img"
-        src="https://bilder.t-online.de/b/86/55/36/76/id_86553676/610/tid_da/frau-fasst-an-ihre-hand-wiederholtes-kribbeln-in-der-hand-sollte-vom-arzt-untersucht-werden-.jpg"
-        height="200"
-        width="200"
-      />
-      
+      <img id="img" src="~assets/hand3.jpg" />
+
       <canvas id="canvas" class="border"></canvas>
-      -->
+
+      <!--
       <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
       <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
       <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+      -->
     </div>
+
+    <body class="bx--body p20">
+      <!-- <img id="img" src="hand.jpg"/>  -->
+      <div class="p20">
+        Handtrack.js allows you prototype handtracking interactions in the
+        browser in 10 lines of code.
+      </div>
+      <div class="mb10">
+        <button
+          id="trackbutton"
+          onclick="toggleVideo()"
+          class="bx--btn bx--btn--secondary"
+          type="button"
+        >
+          Toggle Video
+        </button>
+        <div id="updatenote" class="updatenote mt10">loading model ..</div>
+      </div>
+      <video
+        id="myvideo"
+        class="videobox canvasbox"
+        autoplay="autoplay"
+      ></video>
+
+      <canvas id="canvas" class="border canvasbox"></canvas>
+
+      <script src="https://cdn.jsdelivr.net/npm/handtrackjs/dist/handtrack.min.js"></script>
+      <script src="track.js"></script>
+    </body>
   </div>
 </template>
 
 <script>
 //import * as handTrack from 'handtrackjs'
-import * as handpose from '@tensorflow-models/handpose'
+//import * as handpose from '@tensorflow-models/handpose'
+
 export default {
   components: {},
   mounted: function() {
+    this.startHandTrack()
     // Load the MediaPipe handpose model assets.
     /*
     const img = document.getElementById('img')
@@ -46,6 +78,7 @@ export default {
     */
   },
   methods: {
+    /*
     async startHandPose() {
       const model = await handpose.load()
 
@@ -57,6 +90,24 @@ export default {
       // Each hand object contains a `landmarks` property,
       // which is an array of 21 3-D landmarks.
       hands.forEach((hand) => console.log(hand.landmarks))
+    },
+    */
+    startHandTrack() {
+      const img = document.getElementById('img')
+      const canvas = document.getElementById('canvas')
+      // eslint-disable-next-line no-unused-vars
+      const context = canvas.getContext('2d')
+
+      // Load the model.
+      // eslint-disable-next-line no-undef
+      handTrack.load().then((model) => {
+        console.log('model: ', model)
+        // detect objects in the image.
+        console.log('img', img)
+        model.detect(img).then((predictions) => {
+          console.log('Predictions: ', predictions)
+        })
+      })
     }
     /*
     startVideo() {
@@ -128,5 +179,37 @@ export default {
 
 .links {
   padding-top: 15px;
+}
+body {
+  padding: 20px;
+}
+
+.p20 {
+  padding: 20px;
+}
+
+.canvasbox {
+  border-radius: 3px;
+  margin-right: 10px;
+  width: 450px;
+  height: 338px;
+  border-bottom: 3px solid #0063ff;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2), 0 4px 10px 0 #00000030;
+  background: #333;
+}
+
+.mb10 {
+  margin-bottom: 10px;
+}
+
+.mt10 {
+  margin-top: 10px;
+}
+
+.updatenote {
+  padding: 10px;
+  background: rgb(245, 147, 20);
+  color: white;
+  display: inline;
 }
 </style>
