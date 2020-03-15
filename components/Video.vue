@@ -32,9 +32,9 @@
       <div class="mb10">
         <button
           id="trackbutton"
-          onclick="toggleVideo()"
           class="bx--btn bx--btn--secondary"
           type="button"
+          @click="toggleVideo()"
         >
           Toggle Video
         </button>
@@ -49,7 +49,6 @@
       <canvas id="canvas" class="border canvasbox"></canvas>
 
       <script src="https://cdn.jsdelivr.net/npm/handtrackjs/dist/handtrack.min.js"></script>
-      <script src="track.js"></script>
     </body>
   </div>
 </template>
@@ -61,21 +60,8 @@
 export default {
   components: {},
   mounted: function() {
-    this.startHandTrack()
+    //this.startHandTrack()
     // Load the MediaPipe handpose model assets.
-    /*
-    const img = document.getElementById('img')
-    //const canvas = document.getElementById('canvas')
-    //const context = canvas.getContext('2d')
-
-    // Load the model.
-    handTrack.load().then((model) => {
-      // detect objects in the image.
-      model.detect(img).then((predictions) => {
-        console.log('Predictions: ', predictions)
-      })
-    })
-    */
   },
   methods: {
     /*
@@ -93,37 +79,47 @@ export default {
     },
     */
     startHandTrack() {
-      const img = document.getElementById('img')
+      const video = document.getElementById('myvideo')
       const canvas = document.getElementById('canvas')
-      // eslint-disable-next-line no-unused-vars
       const context = canvas.getContext('2d')
+      let trackButton = document.getElementById('trackbutton')
+      let updateNote = document.getElementById('updatenote')
+
+      let isVideo = false
+      let model = null
+
+      this.startVideo(video, isVideo, canvas, context, model, updateNote)
+
+      const modelParams = {
+        flipHorizontal: true, // flip e.g for video
+        maxNumBoxes: 20, // maximum number of boxes to detect
+        iouThreshold: 0.5, // ioU threshold for non-max suppression
+        scoreThreshold: 0.6 // confidence threshold for predictions.
+      }
 
       // Load the model.
-      // eslint-disable-next-line no-undef
-      handTrack.load().then((model) => {
-        console.log('model: ', model)
+      this.handTrack.load(modelParams).then((lmodel) => {
         // detect objects in the image.
-        console.log('img', img)
-        model.detect(img).then((predictions) => {
-          console.log('Predictions: ', predictions)
-        })
+        model = lmodel
+        updateNote.innerText = 'Loaded Model!'
+        trackButton.disabled = false
       })
-    }
-    /*
-    startVideo() {
+    },
+
+    startVideo(video, isVideo, canvas, context, model, updateNote) {
       this.handTrack.startVideo(video).then(function(status) {
         console.log('video started', status)
         if (status) {
           updateNote.innerText = 'Video started. Now tracking'
           isVideo = true
-          this.runDetection()
+          this.runDetection(video, isVideo, canvas, context, model)
         } else {
           updateNote.innerText = 'Please enable video'
         }
       })
     },
 
-    toggleVideo() {
+    toggleVideo(video, isVideo, updateNote) {
       if (!isVideo) {
         updateNote.innerText = 'Starting video'
         this.startVideo()
@@ -135,7 +131,7 @@ export default {
       }
     },
 
-    runDetection() {
+    runDetection(video, isVideo, canvas, context, model) {
       model.detect(video).then((predictions) => {
         console.log('Predictions: ', predictions)
         model.renderPredictions(predictions, canvas, context, video)
@@ -144,7 +140,6 @@ export default {
         }
       })
     }
-      */
   }
 }
 </script>
