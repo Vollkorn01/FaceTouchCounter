@@ -59,10 +59,16 @@
 
 export default {
   components: {},
+  data: function() {
+    return {
+      model: null
+    }
+  },
   mounted: function() {
     //this.startHandTrack()
     // Load the MediaPipe handpose model assets.
   },
+
   methods: {
     /*
     async startHandPose() {
@@ -79,16 +85,8 @@ export default {
     },
     */
     startHandTrack() {
-      const video = document.getElementById('myvideo')
-      const canvas = document.getElementById('canvas')
-      const context = canvas.getContext('2d')
       let trackButton = document.getElementById('trackbutton')
       let updateNote = document.getElementById('updatenote')
-
-      let isVideo = false
-      let model = null
-
-      this.startVideo(video, isVideo, canvas, context, model, updateNote)
 
       const modelParams = {
         flipHorizontal: true, // flip e.g for video
@@ -100,14 +98,16 @@ export default {
       // Load the model.
       this.handTrack.load(modelParams).then((lmodel) => {
         // detect objects in the image.
-        model = lmodel
+        this.model = lmodel
         updateNote.innerText = 'Loaded Model!'
         trackButton.disabled = false
       })
+      console.log('model: ', this.model)
     },
 
     startVideo(video, isVideo, canvas, context, model, updateNote) {
-      this.handTrack.startVideo(video).then(function(status) {
+      // eslint-disable-next-line no-undef
+      handTrack.startVideo(video).then(function(status) {
         console.log('video started', status)
         if (status) {
           updateNote.innerText = 'Video started. Now tracking'
@@ -119,10 +119,17 @@ export default {
       })
     },
 
-    toggleVideo(video, isVideo, updateNote) {
+    toggleVideo() {
+      const video = document.getElementById('myvideo')
+      const canvas = document.getElementById('canvas')
+      const context = canvas.getContext('2d')
+      let updateNote = document.getElementById('updatenote')
+
+      let isVideo = false
+
       if (!isVideo) {
         updateNote.innerText = 'Starting video'
-        this.startVideo()
+        this.startVideo(video, isVideo, canvas, context, updateNote)
       } else {
         updateNote.innerText = 'Stopping video'
         this.handTrack.stopVideo(video)
@@ -131,10 +138,10 @@ export default {
       }
     },
 
-    runDetection(video, isVideo, canvas, context, model) {
-      model.detect(video).then((predictions) => {
+    runDetection(video, isVideo, canvas, context) {
+      this.model.detect(video).then((predictions) => {
         console.log('Predictions: ', predictions)
-        model.renderPredictions(predictions, canvas, context, video)
+        this.model.renderPredictions(predictions, canvas, context, video)
         if (isVideo) {
           requestAnimationFrame(this.runDetection)
         }
