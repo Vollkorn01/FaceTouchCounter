@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <div>
-      <logo />
+      <Video />
+      <Logo />
       <h1 class="title">
         FaceTouchCounter
       </h1>
@@ -26,9 +27,11 @@
 
 <script>
 import Logo from '~/components/Logo.vue'
+import Video from '~/components/Video.vue'
 
 export default {
   components: {
+    Video,
     Logo
   }
 }
